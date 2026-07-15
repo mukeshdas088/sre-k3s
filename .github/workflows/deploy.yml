@@ -10,10 +10,10 @@ jobs:
     runs-on: ubuntu-latest
     steps:
     - name: Checkout Source Code
-      uses: actions/checkout@v4
+      uses: actions/checkout@v4.2.2  # Upgraded package target
 
     - name: Authenticate with Cluster
-      uses: azure/k8s-set-context@v3
+      uses: azure/k8s-set-context@v4.0.1  # Upgraded syntax to clear Node warning
       with:
         method: kubeconfig
         kubeconfig: ${{ secrets.KUBECONFIG }}
