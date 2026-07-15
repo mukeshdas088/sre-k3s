@@ -1,0 +1,13 @@
+---
+- name: Distribute and run K3s installation script
+  hosts: all
+  gather_facts: false
+
+  tasks:
+    - name: Run K3s Installer inline as root
+      ansible.builtin.shell: "echo '{{ ansible_password }}' | sudo -S curl -sfL https://get.k3s.io | sh -"
+      register: installer_output
+
+    - name: Display installer output
+      ansible.builtin.debug:
+        var: installer_output.stdout_lines

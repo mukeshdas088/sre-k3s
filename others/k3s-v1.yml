@@ -1,0 +1,15 @@
+---
+- name: Distribute and run K3s installation script
+  hosts: all
+  gather_facts: false
+
+  tasks:
+    - name: Copy the local script to the target node
+      ansible.builtin.copy:
+        src: ./k3s.sh
+        dest: /tmp/k3s.sh
+        mode: '0755'
+
+    - name: Execute the script as root using manual sudo pipe
+      ansible.builtin.shell: "echo '{{ ansible_password }}' | sudo -S bash /tmp/k3s.sh"
+      no_log: false

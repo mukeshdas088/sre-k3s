@@ -1,0 +1,29 @@
+---
+- name: Configure and Verify k3s Cluster Natively
+  hosts: k3s_nodes
+  become: true  # Instructs Ansible to execute all tasks via passwordless sudo
+  tasks:
+    - name: Ensure baseline system dependencies are present
+      ansible.builtin.apt:
+        name:
+          - curl
+          - sudo
+        state: present
+        update_cache: true
+
+    - name: Verify that the k3s systemd service is active and running
+      ansible.builtin.systemd:
+        name: k3s
+        state: started
+        enabled: true
+
+    - name: Adjust kubeconfig file permissions for pipeline visibility
+      ansible.builtin.file:
+        path: /etc/rancher/k3s/k3s.yaml
+        mode: '0644'
+
+    - name: Fetch cluster config back to your Mac controller
+      ansible.builtin.fetch:
+        src: /etc/rancher/k3s/k3s.yaml
+        dest: ./kubeconfig-raw
+        flat: true

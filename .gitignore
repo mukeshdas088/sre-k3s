@@ -1,0 +1,4 @@
+.yaml.tmp
+kubeconfig-raw
+.ansible_cache/
+*.retry

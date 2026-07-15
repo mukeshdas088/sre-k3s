@@ -1,0 +1,8 @@
+---
+- name: Install Single-Node k3s Cluster (IPv4 Enforced)
+  hosts: k3s_nodes
+  gather_facts: no
+  tasks:
+    - name: Download and execute k3s installer script (Force IPv4)
+      shell: "curl -sfL https://get.k3s.io > /tmp/k3s_install.sh && echo '{{ ansible_password }}' | INSTALL_K3S_EXEC='server --node-ip=192.168.31.158 --tls-san=192.168.31.158 --write-kubeconfig-mode=644' sudo -S sh /tmp/k3s_install.sh"
+      no_log: true

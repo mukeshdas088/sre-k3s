@@ -1,0 +1,21 @@
+---
+- name: Distribute and run K3s installation script
+  hosts: all
+  gather_facts: false
+
+  tasks:
+    - name: Run K3s Installer directly in one step
+      shell: "echo '{{ ansible_password }}' | sudo -S curl -sfL https://get.k3s.io | sh -"
+      no_log: true
+
+    - name: Wait for database to initialize
+      pause:
+        seconds: 15
+
+    - name: Print active node list
+      shell: "echo '{{ ansible_password }}' | sudo -S /usr/local/bin/kubectl get nodes"
+      register: node_output
+
+    - name: Display K3s Node Status
+      debug:
+        var: node_output.stdout_lines
