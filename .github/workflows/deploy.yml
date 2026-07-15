@@ -1,0 +1,29 @@
+name: Continuous Deployment to k3s
+
+on:
+  push:
+    branches:
+      - main
+
+jobs:
+  deploy-to-cluster:
+    runs-on: ubuntu-latest
+    steps:
+    - name: Checkout Source Code
+      uses: actions/checkout@v4
+
+    - name: Authenticate with Cluster
+      uses: azure/k8s-set-context@v3
+      with:
+        method: kubeconfig
+        kubeconfig: ${{ secrets.KUBECONFIG }}
+
+    - name: Verify Cluster Compute Nodes
+      run: |
+        echo "=== Checking Target Cluster Infrastructure Nodes ==="
+        kubectl get nodes -o wide
+
+    - name: Apply Kubernetes Configuration
+      run: |
+        kubectl apply -f k8s/configmap.yaml
+        kubectl apply -f k8s/deployment.yaml
