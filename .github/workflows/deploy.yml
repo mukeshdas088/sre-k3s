@@ -9,21 +9,23 @@ jobs:
   deploy-to-cluster:
     runs-on: ubuntu-latest
     steps:
-    - name: Checkout Source Code
+    - name: 1. Checkout Application Code Specs
       uses: actions/checkout@v4.2.2
 
-    - name: Authenticate with Cluster
+    - name: 2. Authenticate Context with Cluster
       uses: azure/k8s-set-context@v4.0.1
       with:
         method: kubeconfig
         kubeconfig: ${{ secrets.KUBECONFIG }}
 
-    - name: Verify Cluster Compute Nodes
+    - name: 3. Verify Cluster Compute Nodes Natively
       run: |
         echo "=== Checking Target Cluster Infrastructure Nodes ==="
+        # Natively connects using the authenticated vault profile over TLS
         kubectl get nodes -o wide
 
-    - name: Apply Kubernetes Configuration
+    - name: 4. Apply Kubernetes Application Configuration
       run: |
+        echo "=== Deploying Multi-Replica Nginx Resources ==="
         kubectl apply -f k8s/configmap.yaml
         kubectl apply -f k8s/deployment.yaml
