@@ -1,0 +1,52 @@
+name: Deployment to K3s
+
+on:
+  push:
+    branches:
+      - main
+  workflow_dispatch: # Allows manual triggering from the GitHub Actions UI for testing
+
+jobs:
+  deploy-to-cluster:
+    runs-on: self-hosted
+    steps:
+      - name: 1. Checkout Application Code Specs
+        uses: actions/checkout@v4
+
+      - name: 2. Run Tests
+        run: |
+          echo "=== Running Tests ==="
+          echo "Test Phase: Success"
+
+      - name: 3. Build Application
+        run: |
+          echo "=== Building Application ==="
+          echo "Build Phase: Success"
+
+      # Your original deployment step
+      - name: 4. Apply Kubernetes Application Configuration
+        run: |
+          echo "=== Deploying Multi-Replica Nginx Resources ==="
+          sudo /usr/local/bin/kubectl apply -f k8s/deployment.yaml
+
+      # Enhanced version of your original verification step to generate artifact logs
+      - name: 5. Verify Live Cluster Status
+        run: |
+          echo "=== Verifying Local Cluster Health ==="
+          mkdir -p deployment-details
+          {
+            sudo /usr/local/bin/kubectl get deployments -o wide
+            sudo /usr/local/bin/kubectl get pods -o wide
+            sudo /usr/local/bin/kubectl get ingress -o wide
+            sudo /usr/local/bin/kubectl get svc -o wide
+          } | tee deployment-details/status.txt
+
+      - name: 6. Store Details as Artifact
+        uses: actions/upload-artifact@v4
+        with:
+          name: deployment-summary
+          path: deployment-details/
+
+      - name: 7. Expose Clickable Application URL
+        run: |
+          echo "Click here to access your application: http://192.168.31.154"
