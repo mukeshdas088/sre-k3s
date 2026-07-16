@@ -1,0 +1,26 @@
+name: Continuous Deployment to K3s
+
+on:
+  push:
+    branches:
+      - main
+
+jobs:
+  deploy-to-cluster:
+    runs-on: self-hosted  
+
+    steps:
+      - name: 1. Checkout Application Code Specs
+        uses: actions/checkout@v4
+
+      - name: 2. Apply Kubernetes Application Configuration
+        run: |
+          echo "=== Deploying Multi-Replica Nginx Resources ==="
+          sudo /usr/local/bin/kubectl apply -f k8s/configmap.yaml
+          sudo /usr/local/bin/kubectl apply -f k8s/deployment.yaml
+
+      - name: 3. Verify Live Cluster Status
+        run: |
+          echo "=== Verifying Local Cluster Health ==="
+          sudo /usr/local/bin/kubectl get deployments -o wide
+          sudo /usr/local/bin/kubectl get pods -o wide
