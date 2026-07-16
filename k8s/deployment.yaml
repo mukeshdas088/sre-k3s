@@ -1,3 +1,16 @@
+apiVersion: v1
+kind: ConfigMap
+metadata:
+  name: nginx-helloworld-html
+  namespace: default
+data:
+  index.html: |
+    <!DOCTYPE html>
+    <html>
+    <head><title>Hello World</title></head>
+    <body><h1>Hello World from k3s Cluster!</h1></body>
+    </html>
+---
 apiVersion: apps/v1
 kind: Deployment
 metadata:
@@ -38,3 +51,22 @@ spec:
     targetPort: 80
   selector:
     app: nginx-helloworld
+---
+apiVersion: networking.k8s.io/v1
+kind: Ingress
+metadata:
+  name: nginx-helloworld-ingress
+  namespace: default
+  annotations:
+    ingress.kubernetes.io/ssl-redirect: "false"
+spec:
+  rules:
+  - http:
+      paths:
+      - path: /
+        pathType: Prefix
+        backend:
+          service:
+            name: nginx-helloworld-service
+            port:
+              number: 80

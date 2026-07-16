@@ -1,4 +1,4 @@
-name: Simple Local File Listing
+name: Continuous Deployment to K3s
 
 on:
   push:
@@ -6,16 +6,22 @@ on:
       - main
 
 jobs:
-  list-local-files:
-    # Forces the workflow to run on your local machine instead of the cloud
-    runs-on: self-hosted
+  deploy-to-cluster:
+    runs-on: self-hosted  
 
     steps:
-    - name: 1. Checkout Git Code Specs
-      uses: actions/checkout@v4.2.2
+      - name: 1. Checkout Application Code Specs
+        uses: actions/checkout@v4
 
-    - name: 2. List Files on the Remote Linux Host VM
-      run: |
-        echo "=== Querying Files in /home/system Natively ==="
-        # Since the runner is local, it can securely reach out to your VM's private IP
-        ssh -o StrictHostKeyChecking=no system@192.168.31.154 "ls -la /home/system"
+      - name: 2. Apply Kubernetes Application Configuration
+        run: |
+          echo "=== Deploying Multi-Replica Nginx Resources ==="
+          sudo /usr/local/bin/kubectl apply -f k8s/deployment.yaml
+
+      - name: 3. Verify Live Cluster Status
+        run: |
+          echo "=== Verifying Local Cluster Health ==="
+          sudo /usr/local/bin/kubectl get deployments -o wide
+          sudo /usr/local/bin/kubectl get pods -o wide
+          sudo /usr/local/bin/kubectl get ingress -o wide
+          sudo /usr/local/bin/kubectl get svc -o wide
